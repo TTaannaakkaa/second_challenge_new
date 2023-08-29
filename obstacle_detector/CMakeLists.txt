@@ -34,7 +34,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME} src/${PROJECT_NAME}/obstacle_detector.cpp)
+add_library(${PROJECT_NAME} src/obstacle_detector.cpp)
 
 ## Declare a C++ executable
 add_executable(${PROJECT_NAME}_node src/obstacle_detector_node.cpp)
@@ -43,4 +43,4 @@ add_executable(${PROJECT_NAME}_node src/obstacle_detector_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME} ${catkin_LIBRARIES})
