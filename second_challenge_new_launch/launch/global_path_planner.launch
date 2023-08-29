@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+<launch>
+    <include file="$(find global_path_planner)/launch/global_path_planner_with_debag.launch"/>
+</launch>
