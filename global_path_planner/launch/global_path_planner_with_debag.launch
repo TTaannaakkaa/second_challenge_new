@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- config file path  -->
+    <arg name="rviz_settings" default="$(find global_path_planner)/config/rviz/global_path_planner_with_debag.rviz"/>
+    <arg name="map_settings" default="$(find global_path_planner)/map/map.yaml"/>
+    <arg name="global_path_planner_settings" default="$(find global_path_planner)/config/param/global_path_planner_with_debag.yaml"/>
+
+    <!-- node launch -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_settings)"/>
+    <node pkg="global_path_planner" type="global_path_planner_node" name="global_path_planner" output="screen">
+        <rosparam command="load" file="$(arg global_path_planner_settings)"/>
+    </node>
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_settings)" output="screen"/>
+</launch>
