@@ -5,6 +5,7 @@ ObstacleDetector::ObstacleDetector()
 {
     private_nh_.param("hz", hz_);
     private_nh_.param("lasar_step", lasar_step_);
+    private_nh_.param("robot_frame", robot_frame_);
     private_nh_.param("ignore_distance", ignore_distance_);
     private_nh_.param("ignore_angle_range_list", ignore_angle_range_list_);
 
@@ -40,15 +41,19 @@ void ObstacleDetector::scan_obstacle()
     obstacle_pose_array_.poses.clear();
     for(int i=0;i<lasar_scan_.ranges.size();i+=lasar_step_)
     {
-        if(is_ignore_scan(lasar_scan_.angle_min + lasar_scan_.angle_increment * i))
+        const double angle = lasar_scan_.angle_min + lasar_scan_.angle_increment * i;
+        const double range = lasar_scan_.ranges[i];
+
+        if(is_ignore_scan(angle))
         {
             continue;
         }
-        if(lasar_scan_.ranges[i] < ignore_distance_)
+
+        if(range < ignore_distance_)
         {
             geometry_msgs::Pose obs_pose;
-            obs_pose.position.x = lasar_scan_.ranges[i] * cos(lasar_scan_.angle_min + lasar_scan_.angle_increment * i);
-            obs_pose.position.y = lasar_scan_.ranges[i] * sin(lasar_scan_.angle_min + lasar_scan_.angle_increment * i);
+            obs_pose.position.x = range * cos(angle);
+            obs_pose.position.y = range * sin(angle);
             obstacle_pose_array_.poses.push_back(obs_pose);
         }
     }
