@@ -1,3 +1,11 @@
+/**
+ * @file obstacle_detector.h
+ * @author Takuma Tanaka
+ * @brief detection obstacles from laser scan
+ * @version 0.1
+ * @date 2023-08-30 
+ */
+
 #ifndef OBSTACLR_DETECTOE_H
 #define OBSTACLR_DETECTOE_H
 

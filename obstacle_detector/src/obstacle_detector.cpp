@@ -14,7 +14,9 @@ ObstacleDetector::ObstacleDetector()
 
     obstacle_pose_array_.header.frame_id = robot_frame_;
 }
-
+/**
+ * @brief main function
+ */
 void ObstacleDetector::process()
 {
     ros::Rate loop_rate(hz_);
@@ -30,12 +32,20 @@ void ObstacleDetector::process()
     }
 }
 
+/**
+ * @brief callback function of laser scan
+ * @param msg 
+ */
 void ObstacleDetector::lasar_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
     lasar_scan_ = *msg;
     flag_lasar_scan_ = true;
 }
 
+/**
+ * @brief scan obstacle
+ * 
+ */
 void ObstacleDetector::scan_obstacle()
 {
     obstacle_pose_array_.poses.clear();
@@ -59,6 +69,13 @@ void ObstacleDetector::scan_obstacle()
     }
 }
 
+/**
+ * @brief check if the scan is ignored
+ * 
+ * @param angle     angle of scan
+ * @return true     
+ * @return false 
+ */
 bool ObstacleDetector::is_ignore_scan(double angle)
 {
     for(int i = 0; i < ignore_angle_range_list_.size(); i += 2)
