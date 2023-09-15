@@ -1,13 +1,12 @@
 #include "obstacle_detector/obstacle_detector.h"
 
-ObstacleDetector::ObstacleDetector()
-    : private_nh_("~")
+ObstacleDetector::ObstacleDetector():private_nh_("~")
 {
-    private_nh_.param("hz", hz_);
-    private_nh_.param("lasar_step", lasar_step_);
-    private_nh_.param("robot_frame", robot_frame_);
-    private_nh_.param("ignore_distance", ignore_distance_);
-    private_nh_.param("ignore_angle_range_list", ignore_angle_range_list_);
+    private_nh_.getParam("hz", hz_);
+    private_nh_.getParam("lasar_step", lasar_step_);
+    private_nh_.getParam("robot_frame", robot_frame_);
+    private_nh_.getParam("ignore_distance", ignore_distance_);
+    private_nh_.getParam("ignore_angle_range_list", ignore_angle_range_list_);
 
     lasar_scan_sub_ = nh_.subscribe("/scan", 1, &ObstacleDetector::lasar_scan_callback, this);
     obstacle_pose_pub_ = nh_.advertise<geometry_msgs::PoseArray>("/obstacle_pose", 1);
@@ -48,8 +47,11 @@ void ObstacleDetector::lasar_scan_callback(const sensor_msgs::LaserScan::ConstPt
 void ObstacleDetector::scan_obstacle()
 {
     obstacle_pose_array_.poses.clear();
+    // std::cout << "lasar size : " << lasar_scan_.ranges.size() << std::endl;
+    // std::cout << "lasar step : " << lasar_step_ << std::endl;
     for(int i=0;i<lasar_scan_.ranges.size();i+=lasar_step_)
     {
+        // std::cout << "i : " << i << std::endl;
         const double angle = lasar_scan_.angle_min + lasar_scan_.angle_increment * i;
         const double range = lasar_scan_.ranges[i];
 
@@ -69,7 +71,7 @@ void ObstacleDetector::scan_obstacle()
         obstacle_pose_array_.poses.push_back(obs_pose);
 
     }
-
+    // std::cout << "obstacle size : " << obstacle_pose_array_.poses.size() << std::endl;
     obstacle_pose_pub_.publish(obstacle_pose_array_);
 }
 
