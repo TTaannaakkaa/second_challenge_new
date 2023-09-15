@@ -98,5 +98,3 @@ bool ObstacleDetector::is_ignore_scan(double angle)
 
     return false;
 }
-
-
