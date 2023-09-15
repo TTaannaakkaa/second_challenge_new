@@ -25,7 +25,6 @@ void ObstacleDetector::process()
         if(flag_lasar_scan_)
         {
             scan_obstacle();
-            obstacle_pose_pub_.publish(obstacle_pose_array_);
         }
         ros::spinOnce();
         loop_rate.sleep();
@@ -70,6 +69,8 @@ void ObstacleDetector::scan_obstacle()
         obstacle_pose_array_.poses.push_back(obs_pose);
 
     }
+
+    obstacle_pose_pub_.publish(obstacle_pose_array_);
 }
 
 /**
