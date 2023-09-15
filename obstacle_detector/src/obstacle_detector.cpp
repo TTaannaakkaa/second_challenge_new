@@ -12,7 +12,7 @@ ObstacleDetector::ObstacleDetector()
     lasar_scan_sub_ = nh_.subscribe("/scan", 1, &ObstacleDetector::lasar_scan_callback, this);
     obstacle_pose_pub_ = nh_.advertise<geometry_msgs::PoseArray>("/obstacle_pose", 1);
 
-    obstacle_pose_array_.header.frame_id = robot_frame_;
+    obstacle_pose_array_.header.frame_id = "base_link";
 }
 /**
  * @brief main function
@@ -61,11 +61,14 @@ void ObstacleDetector::scan_obstacle()
 
         if(range < ignore_distance_)
         {
-            geometry_msgs::Pose obs_pose;
-            obs_pose.position.x = range * cos(angle);
-            obs_pose.position.y = range * sin(angle);
-            obstacle_pose_array_.poses.push_back(obs_pose);
+            continue;
         }
+
+        geometry_msgs::Pose obs_pose;
+        obs_pose.position.x = range * cos(angle);
+        obs_pose.position.y = range * sin(angle);
+        obstacle_pose_array_.poses.push_back(obs_pose);
+
     }
 }
 
@@ -78,13 +81,21 @@ void ObstacleDetector::scan_obstacle()
  */
 bool ObstacleDetector::is_ignore_scan(double angle)
 {
-    for(int i = 0; i < ignore_angle_range_list_.size(); i += 2)
+    angle = abs(angle);
+    const int size = ignore_angle_range_list_.size();
+
+    for(int i=0; i<size/2; i++)
     {
-        if(ignore_angle_range_list_[i] < angle && angle < ignore_angle_range_list_[i + 1])
-        {
+        if(ignore_angle_range_list_[i*2] < angle and angle < ignore_angle_range_list_[i*2 + 1])
             return true;
-        }
     }
+
+    if(size%2 == 1)
+    {
+        if(ignore_angle_range_list_[size-1] < angle)
+            return true;
+    }
+
     return false;
 }
 
