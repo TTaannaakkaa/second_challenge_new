@@ -6,8 +6,8 @@
  * @date 2023-08-30 
  */
 
-#ifndef OBSTACLR_DETECTOE_H
-#define OBSTACLR_DETECTOE_H
+#ifndef OBSTACLE_DETECTOR_H
+#define OBSTACLE_DETECTOR_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
@@ -21,27 +21,27 @@ class ObstacleDetector
         void process();
     
     private:
-        void lasar_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg);
+        void laser_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg);
         void scan_obstacle();
         bool is_ignore_scan(double angle);
 
         int hz_;
-        int lasar_step_;
-        double ignore_distance_;
+        int laser_step_;
+        double ignore_dist_;
         std::string robot_frame_;
         std::vector<double> ignore_angle_range_list_;
 
-        bool flag_lasar_scan_ = false;
+        bool flag_laser_scan_ = false;
 
         ros::NodeHandle nh_;
         ros::NodeHandle private_nh_;
 
-        ros::Subscriber lasar_scan_sub_;
+        ros::Subscriber laser_scan_sub_;
 
         ros::Publisher obstacle_pose_pub_;
 
         geometry_msgs::PoseArray obstacle_pose_array_;
-        sensor_msgs::LaserScan lasar_scan_;
+        sensor_msgs::LaserScan laser_scan_;
 };
 
-#endif // OBSTACLR_DETECTOE_H
+#endif // OBSTACLE_DETECTOR_H
