@@ -6,8 +6,8 @@
  * @date 2023-08-30 
  */
 
-#ifndef OBSTACLR_DETECTOE_H
-#define OBSTACLR_DETECTOE_H
+#ifndef OBSTACLE_DETECTOR_H
+#define OBSTACLE_DETECTOR_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
@@ -44,4 +44,4 @@ class ObstacleDetector
         sensor_msgs::LaserScan lasar_scan_;
 };
 
-#endif // OBSTACLR_DETECTOE_H
+#endif // OBSTACLE_DETECTOR_H

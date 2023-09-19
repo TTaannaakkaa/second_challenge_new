@@ -48,22 +48,22 @@ void ObstacleDetector::scan_obstacle()
 {
     obstacle_pose_array_.poses.clear();
     // std::cout << "lasar size : " << lasar_scan_.ranges.size() << std::endl;
-    // std::cout << "lasar step : " << lasar_step_ << std::endl;
+    std::cout << "lasar step : " << lasar_step_ << std::endl;
     for(int i=0;i<lasar_scan_.ranges.size();i+=lasar_step_)
     {
         // std::cout << "i : " << i << std::endl;
         const double angle = lasar_scan_.angle_min + lasar_scan_.angle_increment * i;
         const double range = lasar_scan_.ranges[i];
 
-        if(is_ignore_scan(angle))
-        {
-            continue;
-        }
+        // if(is_ignore_scan(angle))
+        // {
+        //     continue;
+        // }
 
-        if(range < ignore_distance_)
-        {
-            continue;
-        }
+        // if(range < ignore_distance_)
+        // {
+        //     continue;
+        // }
 
         geometry_msgs::Pose obs_pose;
         obs_pose.position.x = range * cos(angle);
