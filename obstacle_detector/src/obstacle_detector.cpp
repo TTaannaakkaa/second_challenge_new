@@ -3,12 +3,11 @@
 ObstacleDetector::ObstacleDetector():private_nh_("~")
 {
     private_nh_.getParam("hz", hz_);
-    private_nh_.getParam("lasar_step", lasar_step_);
-    private_nh_.getParam("robot_frame", robot_frame_);
+    private_nh_.getParam("laser_step", laser_step_);
     private_nh_.getParam("ignore_distance", ignore_distance_);
     private_nh_.getParam("ignore_angle_range_list", ignore_angle_range_list_);
 
-    lasar_scan_sub_ = nh_.subscribe("/scan", 1, &ObstacleDetector::lasar_scan_callback, this);
+    laser_scan_sub_ = nh_.subscribe("/scan", 1, &ObstacleDetector::laser_scan_callback, this);
     obstacle_pose_pub_ = nh_.advertise<geometry_msgs::PoseArray>("/obstacle_pose", 1);
 
     obstacle_pose_array_.header.frame_id = "base_link";
@@ -21,7 +20,7 @@ void ObstacleDetector::process()
     ros::Rate loop_rate(hz_);
     while(ros::ok())
     {
-        if(flag_lasar_scan_)
+        if(flag_laser_scan_)
         {
             scan_obstacle();
         }
@@ -34,10 +33,10 @@ void ObstacleDetector::process()
  * @brief callback function of laser scan
  * @param msg 
  */
-void ObstacleDetector::lasar_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
+void ObstacleDetector::laser_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-    lasar_scan_ = *msg;
-    flag_lasar_scan_ = true;
+    laser_scan_ = *msg;
+    flag_laser_scan_ = true;
 }
 
 /**
@@ -47,13 +46,11 @@ void ObstacleDetector::lasar_scan_callback(const sensor_msgs::LaserScan::ConstPt
 void ObstacleDetector::scan_obstacle()
 {
     obstacle_pose_array_.poses.clear();
-    // std::cout << "lasar size : " << lasar_scan_.ranges.size() << std::endl;
-    std::cout << "lasar step : " << lasar_step_ << std::endl;
-    for(int i=0;i<lasar_scan_.ranges.size();i+=lasar_step_)
+
+    for(int i=0;i<laser_scan_.ranges.size();i+=laser_step_)
     {
-        // std::cout << "i : " << i << std::endl;
-        const double angle = lasar_scan_.angle_min + lasar_scan_.angle_increment * i;
-        const double range = lasar_scan_.ranges[i];
+        const double angle = laser_scan_.angle_min + laser_scan_.angle_increment * i;
+        const double range = laser_scan_.ranges[i];
 
         // if(is_ignore_scan(angle))
         // {
