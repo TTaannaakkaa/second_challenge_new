@@ -4,7 +4,7 @@ ObstacleDetector::ObstacleDetector():private_nh_("~")
 {
     private_nh_.getParam("hz", hz_);
     private_nh_.getParam("laser_step", laser_step_);
-    private_nh_.getParam("ignore_distance", ignore_distance_);
+    private_nh_.getParam("ignore_dist", ignore_dist_);
     private_nh_.getParam("ignore_angle_range_list", ignore_angle_range_list_);
 
     laser_scan_sub_ = nh_.subscribe("/scan", 1, &ObstacleDetector::laser_scan_callback, this);
@@ -52,15 +52,15 @@ void ObstacleDetector::scan_obstacle()
         const double angle = laser_scan_.angle_min + laser_scan_.angle_increment * i;
         const double range = laser_scan_.ranges[i];
 
-        // if(is_ignore_scan(angle))
-        // {
-        //     continue;
-        // }
+        if(is_ignore_scan(angle))
+        {
+            continue;
+        }
 
-        // if(range < ignore_distance_)
-        // {
-        //     continue;
-        // }
+        if(range < ignore_dist_)
+        {
+            continue;
+        }
 
         geometry_msgs::Pose obs_pose;
         obs_pose.position.x = range * cos(angle);
@@ -68,7 +68,6 @@ void ObstacleDetector::scan_obstacle()
         obstacle_pose_array_.poses.push_back(obs_pose);
 
     }
-    // std::cout << "obstacle size : " << obstacle_pose_array_.poses.size() << std::endl;
     obstacle_pose_pub_.publish(obstacle_pose_array_);
 }
 

@@ -27,7 +27,7 @@ class ObstacleDetector
 
         int hz_;
         int laser_step_;
-        double ignore_distance_;
+        double ignore_dist_;
         std::string robot_frame_;
         std::vector<double> ignore_angle_range_list_;
 
