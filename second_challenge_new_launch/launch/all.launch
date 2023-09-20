@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find global_path_planner)/launch/global_path_planner_with_debag.launch"/>
+    <include file="$(find obstacle_detector)/launch/obstacle_detector.launch"/>
+    <include file="$(find local_map_creator)/launch/local_map_creator.launch"/>
+</launch>
