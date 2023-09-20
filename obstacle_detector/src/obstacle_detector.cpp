@@ -12,9 +12,7 @@ ObstacleDetector::ObstacleDetector():private_nh_("~")
 
     obstacle_pose_array_.header.frame_id = "base_link";
 }
-/**
- * @brief main function
- */
+
 void ObstacleDetector::process()
 {
     ros::Rate loop_rate(hz_);
@@ -29,20 +27,14 @@ void ObstacleDetector::process()
     }
 }
 
-/**
- * @brief callback function of laser scan
- * @param msg 
- */
+
 void ObstacleDetector::laser_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
     laser_scan_ = *msg;
     flag_laser_scan_ = true;
 }
 
-/**
- * @brief scan obstacle
- * 
- */
+
 void ObstacleDetector::scan_obstacle()
 {
     obstacle_pose_array_.poses.clear();
@@ -71,13 +63,6 @@ void ObstacleDetector::scan_obstacle()
     obstacle_pose_pub_.publish(obstacle_pose_array_);
 }
 
-/**
- * @brief check if the scan is ignored
- * 
- * @param angle     angle of scan
- * @return true     
- * @return false 
- */
 bool ObstacleDetector::is_ignore_scan(double angle)
 {
     angle = abs(angle);
