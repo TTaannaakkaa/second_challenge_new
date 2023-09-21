@@ -15,21 +15,61 @@
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/Pose.h>
 
+/**
+ * @brief Class for local map creator
+ */
 class LocalMapCreator
 {
 public:
+    /**
+     * @brief Constructor for the LocalMapCreator
+     */
     LocalMapCreator();
+
+    /**
+     * @brief Caluculate local map
+     */
     void process();
 
 private:
-
+    /**
+     * @brief A callback to hadldle obstacle poses message
+     */
     void obs_poses_callback(const geometry_msgs::PoseArrayConstPtr& msg);
 
+    /**
+     * @brief Check if the point is in the local map
+     * @param x The point x coordinate
+     * @param y The point y coordinate
+     * @return true if the point is in the local map
+     * @return false if the point is not in the local map
+     */
     bool is_in_local_map(const double x, const double y);
-    int get_grid_index(const double x, const double y);
+
+    /**
+     * @brief Get the grid index in the local map
+     * @param dist The distance from the robot
+     * @param angle The angle from the front of the robot
+     * @return The grid index in the local map
+     */
+    int get_grid_index(const double dist, const double angle);
+
+    /**
+     * @brief Convert the point coordinate to the grid index
+     * @param x The point x coordinate
+     * @param y The point y coordinate
+     * @return The grid index in the local map
+     */
     int xy_to_index(const double x, const double y);
 
+    /**
+     * @brief Initialize the local map
+     */
     void init_local_map();
+
+    /**
+     * @brief Update the local map
+     */
     void update_local_map();
 
     int hz_;
