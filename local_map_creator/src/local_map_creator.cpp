@@ -11,9 +11,9 @@
 
 LocalMapCreator::LocalMapCreator():private_nh_("~")
 {
-    private_nh_.param("hz", hz_);
-    private_nh_.param("local_map_size", local_map_size_);
-    private_nh_.param("local_map_resolution", local_map_resolution_);
+    private_nh_.getParam("hz", hz_);
+    private_nh_.getParam("map_size", local_map_size_);
+    private_nh_.getParam("map_reso", local_map_resolution_);
 
     sub_obs_poses_ = nh_.subscribe("/obstacle_pose", 1, &LocalMapCreator::obs_poses_callback, this);
     pub_local_map_ = nh_.advertise<nav_msgs::OccupancyGrid>("/local_map", 1);
@@ -55,44 +55,64 @@ void LocalMapCreator::process()
 void LocalMapCreator::init_local_map()
 {
     local_map_.data.clear();
-    local_map_.data.resize(local_map_.info.width * local_map_.info.height, 0);
+    local_map_.data.assign(local_map_.info.width * local_map_.info.height, -1);
+
 }
 
 void LocalMapCreator::update_local_map()
 {
+
     for(int i = 0; i < obs_poses_.poses.size(); i++)
     {
-        if(is_in_local_map(obs_poses_.poses[i].position.x, obs_poses_.poses[i].position.y))
-        {
-            int index = get_glid_index(obs_poses_.poses[i].position.x, obs_poses_.poses[i].position.y);
-            local_map_.data[index] = 100;
-        }
+        const double x = obs_poses_.poses[i].position.x;
+        const double y = obs_poses_.poses[i].position.y;
+        const double dist = hypot(x, y);
+        const double angle = atan2(y, x);
+
+            for(double dist_from_robot=0.0; (dist_from_robot<dist && is_in_local_map(dist_from_robot, angle)); dist_from_robot+=local_map_resolution_)
+            {
+                const int grid_index = get_grid_index(dist_from_robot,angle);
+                local_map_.data[grid_index] = 0;
+            }
+            if(is_in_local_map(dist, angle))
+            {
+                const int grid_index = xy_to_index(x,y);
+                local_map_.data[grid_index] = 100;
+            }
     }
 }
 
-bool LocalMapCreator::is_in_local_map(const double x, const double y)
+bool LocalMapCreator::is_in_local_map(const double dist, const double angle)
 {
-    if(x < local_map_.info.origin.position.x || x > local_map_.info.origin.position.x + local_map_.info.width * local_map_.info.resolution)
-    {
-        return false;
-    }
-    if(y < local_map_.info.origin.position.y || y > local_map_.info.origin.position.y + local_map_.info.height * local_map_.info.resolution)
-    {
-        return false;
-    }
+    const double x = dist * cos(angle);
+    const double y = dist * sin(angle);
+    const int index_x = int(round((x - local_map_.info.origin.position.x) / local_map_.info.resolution));
+    const int index_y = int(round((y - local_map_.info.origin.position.y) / local_map_.info.resolution));
 
-    return true;
+    if(index_x < local_map_.info.width && index_x >= 0 && index_y < local_map_.info.height && index_y >= 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
-int LocalMapCreator::get_glid_index(const double x, const double y)
+int LocalMapCreator::get_grid_index(const double dist, const double angle)
 {
+    const double x = dist * cos(angle);
+    const double y = dist * sin(angle);
     int index = xy_to_index(x, y);
     return index;
 }
 
 int LocalMapCreator::xy_to_index(const double x, const double y)
 {
-    int index = int(round((x - local_map_.info.origin.position.x) / local_map_.info.resolution)) + int(round((y - local_map_.info.origin.position.y) / local_map_.info.resolution)) * local_map_.info.width;
+    const int index_x = int(round((x - local_map_.info.origin.position.x) / local_map_.info.resolution));
+    const int index_y = int(round((y - local_map_.info.origin.position.y) / local_map_.info.resolution));
+
+    int index = index_y * local_map_.info.width + index_x;
     return index;
 }
 

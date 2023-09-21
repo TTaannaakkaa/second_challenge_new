@@ -26,7 +26,7 @@ private:
     void obs_poses_callback(const geometry_msgs::PoseArrayConstPtr& msg);
 
     bool is_in_local_map(const double x, const double y);
-    int get_glid_index(const double x, const double y);
+    int get_grid_index(const double x, const double y);
     int xy_to_index(const double x, const double y);
 
     void init_local_map();
