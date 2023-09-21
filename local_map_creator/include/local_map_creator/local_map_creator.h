@@ -40,7 +40,7 @@ private:
     
 
     ros::NodeHandle nh_;
-    ros::NodeHandle pnh_;
+    ros::NodeHandle private_nh_;
 
     ros::Subscriber sub_obs_poses_;
 

@@ -9,15 +9,13 @@
 
 #include "local_map_creator/local_map_creator.h"
 
-LocalMapCreator::LocalMapCreator()
-    : nh_(),
-      pnh_("~")
+LocalMapCreator::LocalMapCreator():private_nh_("~")
 {
-    pnh_.param("hz", hz_);
-    pnh_.param("local_map_size", local_map_size_);
-    pnh_.param("local_map_resolution", local_map_resolution_);
+    private_nh_.param("hz", hz_);
+    private_nh_.param("local_map_size", local_map_size_);
+    private_nh_.param("local_map_resolution", local_map_resolution_);
 
-    sub_obs_poses_ = nh_.subscribe("/map", 1, &LocalMapCreator::obs_poses_callback, this);
+    sub_obs_poses_ = nh_.subscribe("/obstacle_pose", 1, &LocalMapCreator::obs_poses_callback, this);
     pub_local_map_ = nh_.advertise<nav_msgs::OccupancyGrid>("/local_map", 1);
 
     local_map_.header.frame_id = "base_link";
@@ -49,7 +47,6 @@ void LocalMapCreator::process()
             update_local_map();
             pub_local_map_.publish(local_map_);
         }
-
         ros::spinOnce();
         loop_rate.sleep();
     }
