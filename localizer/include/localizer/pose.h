@@ -1,9 +1,21 @@
+/**
+ * @file pose.h
+ * @author Takuma Tanaka
+ * @brief 
+ * @version 0.1
+ * @date 2023-09-22
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #ifndef POSE_H
 #define POSE_H
 
 #include <cmath>
 
-
+/**
+ * @brief class for pose
+ */
 class Pose
 {
 public:
