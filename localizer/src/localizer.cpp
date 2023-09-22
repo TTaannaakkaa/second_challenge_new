@@ -266,14 +266,14 @@ void EMCL::observation_update()
 
     if(alpha < alpha_th_ and reset_counter < reset_count_limit_) // 尤度が小さ過ぎる場合
     {
-        std::cout << "[resetting] alpha = " << std::fixed << std::setprecision(4) << alpha << std::endl;
+        // std::cout << "[resetting] alpha = " << std::fixed << std::setprecision(4) << alpha << std::endl;
         median_pose();         // 推定位置の決定（中央値）
         expansion_resetting(); // 膨張リセット
         reset_counter++;
     }
     else
     {
-        std::cout << "[resampling] alpha = " << std::fixed << std::setprecision(4) << alpha << std::endl;
+        // std::cout << "[resampling] alpha = " << std::fixed << std::setprecision(4) << alpha << std::endl;
         estimate_pose(); // 推定位置の決定
         resampling();    // リサンプリング
         reset_counter = 0;
