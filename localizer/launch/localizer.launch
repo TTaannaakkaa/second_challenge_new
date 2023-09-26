@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- config file path -->
+    <arg name="localizer_settings" default="$(find localizer)/config/param/localizer.yaml"/>
+
+    <node pkg="localizer" type="localizer_node" name="localizer" output="screen">
+        <rosparam command="load" file="$(arg localizer_settings)"/>
+    </node>
+</launch>

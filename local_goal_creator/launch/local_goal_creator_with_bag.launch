@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="rviz_settings" default="$(find local_goal_creator)/config/rviz/local_goal_creator.rviz"/>
+    <arg name="local_goal_creator_settings" default="$(find local_goal_creator)/config/param/local_goal_creator.yaml"/>
+
+    <include file="$(find global_path_planner)/launch/global_path_planner.launch"/>
+    <include file="$(find localizer)/launch/localizer.launch"/>
+
+    <node pkg="local_goal_creator" type="local_goal_creator_node" name="local_goal_creator" output="screen">
+        <rosparam command="load" file="$(arg local_goal_creator_settings)"/>
+    </node>
+    
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_settings)"/>
+
+    <node pkg="rosbag" type="play" name="rosbag" args="$(env HOME)/bagfiles/final_judgement.bag"/>
+</launch>

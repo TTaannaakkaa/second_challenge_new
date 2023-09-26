@@ -3,7 +3,7 @@
 int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "local_goal_creator");
-    LocalGoalCrreator localgoalcreator;
+    LocalGoalCreator localgoalcreator;
     localgoalcreator.process();
 
     return 0;
