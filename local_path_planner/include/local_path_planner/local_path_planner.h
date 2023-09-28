@@ -9,7 +9,8 @@
 #include <nav_msgs/Path.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2/utils.h>
-#include "roomba_500driver_meiji/RoombaCtrl.h"
+
+#include "/home/amsl/catkin_ws/devel/.private/roomba_500driver_meiji/include/roomba_500driver_meiji/RoombaCtrl.h"
 
 struct State
 {
@@ -28,10 +29,10 @@ struct Dynamic_Window
     double min_yawrate;
 };
 
-class DWA
+class DWAPlanner
 {
     public:
-        DWA();
+        DWAPlanner();
         void process();
 
     private:
@@ -62,7 +63,7 @@ class DWA
         double max_accel_;
         double max_dyawrate_;
         double v_reso_;
-        double yawrate_reso_;
+        double y_reso_;
         double predict_time_;
         double heading_cost_gain_;
         double velocity_cost_gain_;
