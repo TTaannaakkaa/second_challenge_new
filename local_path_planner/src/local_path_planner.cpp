@@ -42,7 +42,7 @@ void DWAPlanner::local_goal_callback(const geometry_msgs::PointStamped::ConstPtr
         flag_local_goal_ = false;
         return;
     }
-    tf2::doTransform(*msg, local_goal_, transform);
+    tf2::doTransform(*msg, local_goal_, transformStamped);
 }
 
 void DWAPlanner::obs_pose_callback(const geometry_msgs::PoseArray::ConstPtr& msg)
@@ -97,8 +97,8 @@ void DWAPlanner::process()
 void DWAPlanner::roomba_ctl(double vel, double yawrate)
 {
     roomba_ctl_msg_.mode = 11;
-    roomba_ctl_.cntl.linear.x = vel;
-    roomba_ctl_.cntl.angular.z = yawrate;
+    roomba_ctl_msg_.cntl.linear.x = vel;
+    roomba_ctl_msg_.cntl.angular.z = yawrate;
 
     cmd_speed_pub_.publish(roomba_ctl_msg_);
 }
@@ -115,7 +115,7 @@ std::vector<double> DWAPlanner::calc_input()
     int i = 0;
     for(double velocity=dw_.min_vel; velocity<=dw_.max_vel; velocity+=v_reso_)
     {
-        for(double yawrate=dw_.min_yawrate; yawrate<=dw_.max_yawrate; yawrate+=y_rate)
+        for(double yawrate=dw_.min_yawrate; yawrate<=dw_.max_yawrate; yawrate+=yawrate)
         {
             const std::vector<State> trajectory = calc_trajectory(velocity, yawrate);
             double score = calc_eval(trajectory);
@@ -132,10 +132,10 @@ std::vector<double> DWAPlanner::calc_input()
         }
     }
 
-    rooma_.velocity = input[0];
-    rooma_.yawrate = input[1];
+    roomba_.vel = input[0];
+    roomba_.yawrate = input[1];
 
-    ros::Timr now = ros::Time::now();
+    ros::Time now = ros::Time::now();
     for(int i=0; i<trajectory_list.size(); i++)
     {
         if(i == max_score_index)
@@ -155,23 +155,23 @@ void DWAPlanner::calc_dynamic_window()
 {
     double Vs[] = {min_vel_, max_vel_, min_yawrate_, max_yawrate_};
 
-    double Vd[] = {roomba_.velocity - max_accel_*dt_,
-                   roomba_.velocity + max_accel_*dt_,
+    double Vd[] = {roomba_.vel - max_accel_*dt_,
+                   roomba_.vel + max_accel_*dt_,
                    roomba_.yawrate - max_dyawrate_*dt_,
                    roomba_.yawrate + max_dyawrate_*dt_};
 
-    dw_.min_vel = *std::max(Vs[0], Vd[0]);
-    dw_.max_vel = *std::min(Vs[1], Vd[1]);
-    dw_.min_yawrate = *std::max(Vs[2], Vd[2]);
-    dw_.max_yawrate = *std::min(Vs[3], Vd[3]);
+    dw_.min_vel = std::max(Vs[0], Vd[0]);
+    dw_.max_vel = std::min(Vs[1], Vd[1]);
+    dw_.min_yawrate = std::max(Vs[2], Vd[2]);
+    dw_.max_yawrate = std::min(Vs[3], Vd[3]);
 }
 
-void DWAPlanner::calc_trajectory(double vel, double yawrate)
+std::vector<State> DWAPlanner::calc_trajectory(double vel, double yawrate)
 {
     std::vector<State> trajectory;
     State state = {0.0, 0.0, 0.0, 0.0, 0.0};
 
-    for(int t=0; i<=predict_time_; i+=dt_)
+    for(int t=0; t<=predict_time_; t+=dt_)
     {
         move_robot_image(state, vel, yawrate);
         trajectory.push_back(state);
@@ -186,7 +186,7 @@ void DWAPlanner::move_robot_image(State& state, double vel, double yawrate)
     state.y += vel * sin(state.yaw) * dt_;
     state.yaw += yawrate * dt_;
     state.yaw = nomalize_angle(state.yaw);
-    state.velocity = vel;
+    state.vel = vel;
     state.yawrate = yawrate;
 }
 
@@ -204,7 +204,7 @@ double DWAPlanner::nomalize_angle(double angle)
     return angle;
 }
 
-void DWAPlanner::calc_eval(const std::vector<State>& trajectory)
+double DWAPlanner::calc_eval(const std::vector<State>& trajectory)
 {
     double heading =  calc_heading_eval(trajectory);
     double velocity = calc_velocity_eval(trajectory);
@@ -213,7 +213,7 @@ void DWAPlanner::calc_eval(const std::vector<State>& trajectory)
     return heading_cost_gain_ * heading + velocity_cost_gain_ * velocity + distance_cost_gain_ * distance;
 }
 
-void DWAPlanner::calc_heading_eval(const std::vector<State>& trajectory)
+double DWAPlanner::calc_heading_eval(const std::vector<State>& trajectory)
 {
     double dx = local_goal_.point.x - trajectory.back().x;
     double dy = local_goal_.point.y - trajectory.back().y;
@@ -232,11 +232,11 @@ void DWAPlanner::calc_heading_eval(const std::vector<State>& trajectory)
     return (M_PI - abs(nomalize_angle(heading - M_PI))) / M_PI;
 }
 
-void DWAPlanner::calc_velosity_eval(const std::vector<State>& trajectory)
+double DWAPlanner::calc_velocity_eval(const std::vector<State>& trajectory)
 {
-    if(0.0 < trajectory.back().velocity and trajectory.back().velocity < max_vel_)
+    if(0.0 < trajectory.back().vel and trajectory.back().vel < max_vel_)
     {
-        return trajectory.back().velocity / max_vel_;
+        return trajectory.back().vel / max_vel_;
     }
     else
     {
@@ -244,14 +244,44 @@ void DWAPlanner::calc_velosity_eval(const std::vector<State>& trajectory)
     }
 }
 
-void DWAPlanner::calc_distance_eval(const std::vector<State>& trajectory)
+double DWAPlanner::calc_distance_eval(const std::vector<State>& trajectory)
 {
-    double min_dist = serch_range_;
-    
+    double min_dist = search_range_;
 
-    double dx = local_goal_.point.x - trajectory.back().x;
-    double dy = local_goal_.point.y - trajectory.back().y;
-    double distance = hypot(dx, dy);
+    for(const auto& state : trajectory)
+    {
+        for(const auto& obs : obs_pose_.poses)
+        {
+            double dx = state.x - obs.position.x;
+            double dy = state.y - obs.position.y;
+            double dist = hypot(dx, dy);
 
-    return distance / search_range_;
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+            }
+        }
+    }
+
+    return min_dist / search_range_;
+}
+
+void visualize_trajectory(const std::vector<State>& trajectory, const ros::Publisher& local_path_pub, const ros::Time now)
+{
+    nav_msgs::Path local_path;
+    local_path.header.stamp = now;
+    local_path.header.frame_id = "base_link";
+
+    geometry_msgs::PoseStamped pose;
+    pose.header.stamp = now;
+    pose.header.frame_id = "base_link";
+
+    for(const auto& state : trajectory)
+    {
+        pose.pose.position.x = state.x;
+        pose.pose.position.y = state.y;
+        local_path.poses.push_back(pose);
+    }
+
+    local_path_pub.publish(local_path);
 }

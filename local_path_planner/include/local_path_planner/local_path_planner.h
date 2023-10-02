@@ -40,8 +40,8 @@ class DWAPlanner
         void obs_pose_callback(const geometry_msgs::PoseArray::ConstPtr& msg);
 
         void roomba_ctl(double vel, double yawrate);
-        void move_robot_image(double vel, double yawrate);
-        void visualize_trajectory(std::vector<State> trajectory, ros::Publisher& local_path_pub, ros::Time now);
+        void move_robot_image(State& state, double vel, double yawrate);
+        void visualize_trajectory(std::vector<State>& trajectory, ros::Publisher& local_path_pub, ros::Time now);
         double nomalize_angle(double angle);
         double calc_eval(const std::vector<State>& trajectory);
         double calc_heading_eval(const std::vector<State>& trajectory);
@@ -71,6 +71,7 @@ class DWAPlanner
         double robot_radius_;
         double radius_margin_;
         double search_range_;
+
 
         bool flag_local_goal_ = false;
         bool flag_obs_pose_ = false;
