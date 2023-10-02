@@ -3,10 +3,8 @@
     <!--  config file path  -->
     <arg name="local_map_creator_settings" default="$(find local_map_creator)/config/param/local_map_creator.yaml"/>
     <arg name="obstacle_detector_settings" default="$(find obstacle_detector)/config/param/obstacle_detector.yaml"/>
-    <arg name="rviz_settings" default="$(find local_map_creator)/config/rviz/local_map_creator.rviz"/>
-
+   
     <!--  node launch  -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_settings)" output="screen"/>
     <node name="local_map_creator" pkg="local_map_creator" type="local_map_creator_node" output="screen">
         <rosparam command="load" file="$(arg local_map_creator_settings)"/>
     </node>

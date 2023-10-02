@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="rviz_settings" default="$(find local_path_planner)/config/rviz/local_path_planner.rviz"/>
+    <arg name="local_path_planner_settings" default="$(find local_path_planner)/config/param/local_path_planner.yaml"/>
+
+    <include file="$(find global_path_planner)/launch/global_path_planner.launch"/>
+    <include file="$(find localizer)/launch/localizer.launch"/>
+    <include file="$(find local_goal_creator)/launch/local_goal_creator.launch"/>"
+    <include file="$(find local_map_creator)/launch/local_map_creator.launch"/>
+
+    <node pkg="local_path_planner" type="local_path_planner_node" name="local_path_planner" output="screen">
+        <rosparam command="load" file="$(arg local_path_planner_settings)"/>
+    </node>
+    
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_settings)"/>
+
+    <node pkg="rosbag" type="play" name="rosbag" args="$(env HOME)/bagfiles/final_judgement.bag"/>
+</launch>

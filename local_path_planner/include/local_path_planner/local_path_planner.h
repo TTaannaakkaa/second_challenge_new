@@ -41,7 +41,7 @@ class DWAPlanner
 
         void roomba_ctl(double vel, double yawrate);
         void move_robot_image(State& state, double vel, double yawrate);
-        void visualize_trajectory(std::vector<State>& trajectory, ros::Publisher& local_path_pub, ros::Time now);
+        void visualize_trajectory(const std::vector<State>& trajectory, const ros::Publisher& local_path_pub, const ros::Time now);
         double nomalize_angle(double angle);
         double calc_eval(const std::vector<State>& trajectory);
         double calc_heading_eval(const std::vector<State>& trajectory);

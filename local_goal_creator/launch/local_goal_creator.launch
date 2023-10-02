@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="local_goal_creator_settings" default="$(find local_goal_creator)/config/param/local_goal_creator.yaml"/>
+
+    <node pkg="local_goal_creator" type="local_goal_creator_node" name="local_goal_creator" output="screen">
+        <rosparam command="load" file="$(arg local_goal_creator_settings)"/>
+    </node>
+</launch>

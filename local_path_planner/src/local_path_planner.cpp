@@ -21,6 +21,7 @@ DWAPlanner::DWAPlanner():private_nh_("~")
     private_nh_.getParam("radius_margin", radius_margin_);
     private_nh_.getParam("search_range", search_range_);
 
+
     local_goal_sub_ = nh_.subscribe("/local_goal", 1, &DWAPlanner::local_goal_callback, this);
     obs_pose_sub_ = nh_.subscribe("/obstacle_pose", 1, &DWAPlanner::obs_pose_callback, this);
 
@@ -53,7 +54,7 @@ void DWAPlanner::obs_pose_callback(const geometry_msgs::PoseArray::ConstPtr& msg
 
 bool DWAPlanner::is_goal_reached()
 {
-    if(not(flag_local_goal_ and flag_obs_pose_))
+    if(not(flag_local_goal_ or flag_obs_pose_))
     {
         return false;
     }
@@ -74,6 +75,7 @@ bool DWAPlanner::is_goal_reached()
 
 void DWAPlanner::process()
 {
+    ROS_WARN_STREAM("hogehoge");
     ros::Rate loop_rate(hz_);
     tf2_ros::TransformListener tfListener(tfBuffer_);
 
@@ -266,7 +268,7 @@ double DWAPlanner::calc_distance_eval(const std::vector<State>& trajectory)
     return min_dist / search_range_;
 }
 
-void visualize_trajectory(const std::vector<State>& trajectory, const ros::Publisher& local_path_pub, const ros::Time now)
+void DWAPlanner::visualize_trajectory(const std::vector<State>& trajectory, const ros::Publisher& local_path_pub, const ros::Time now)
 {
     nav_msgs::Path local_path;
     local_path.header.stamp = now;
