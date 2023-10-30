@@ -63,7 +63,7 @@ bool DWAPlanner::is_goal_reached()
     double dy = local_goal_.point.y;
     double dist = hypot(dx, dy);
 
-    if(dist < goal_tolerance_)
+    if(dist > goal_tolerance_)
     {
         return true;
     }
@@ -75,15 +75,16 @@ bool DWAPlanner::is_goal_reached()
 
 void DWAPlanner::process()
 {
-    ROS_WARN_STREAM("hogehoge");
     ros::Rate loop_rate(hz_);
     tf2_ros::TransformListener tfListener(tfBuffer_);
 
     while(ros::ok())
     {
-        if(not(is_goal_reached()))
+        if(is_goal_reached())
         {
             const std::vector<double> input = calc_input();
+            ROS_WARN_STREAM("input[0]: " << input[0]);
+            ROS_WARN_STREAM("input[1]: " << input[1]);
             roomba_ctl(input[0], input[1]);
         }
         else
@@ -107,6 +108,7 @@ void DWAPlanner::roomba_ctl(double vel, double yawrate)
 
 std::vector<double> DWAPlanner::calc_input()
 {
+    // ROS_WARN_STREAM("calc_input");
     std::vector<double> input;
     std::vector<std::vector<State>> trajectory_list;
     double max_score = -1.0;
@@ -130,6 +132,7 @@ std::vector<double> DWAPlanner::calc_input()
                 input[0] = velocity;
                 input[1] = yawrate;
             }
+            // ROS_WARN_STREAM("i: " << i);
             i++;
         }
     }
@@ -155,6 +158,7 @@ std::vector<double> DWAPlanner::calc_input()
 
 void DWAPlanner::calc_dynamic_window()
 {
+    ROS_WARN_STREAM("calc_dynamic_window");
     double Vs[] = {min_vel_, max_vel_, min_yawrate_, max_yawrate_};
 
     double Vd[] = {roomba_.vel - max_accel_*dt_,
@@ -166,6 +170,10 @@ void DWAPlanner::calc_dynamic_window()
     dw_.max_vel = std::min(Vs[1], Vd[1]);
     dw_.min_yawrate = std::max(Vs[2], Vd[2]);
     dw_.max_yawrate = std::min(Vs[3], Vd[3]);
+    // ROS_WARN_STREAM("dw_.min_vel: " << dw_.min_vel);
+    // ROS_WARN_STREAM("dw_.max_vel: " << dw_.max_vel);
+    // ROS_WARN_STREAM("dw_.min_yawrate: " << dw_.min_yawrate);
+    // ROS_WARN_STREAM("dw_.max_yawrate: " << dw_.max_yawrate);
 }
 
 std::vector<State> DWAPlanner::calc_trajectory(double vel, double yawrate)
@@ -173,17 +181,22 @@ std::vector<State> DWAPlanner::calc_trajectory(double vel, double yawrate)
     std::vector<State> trajectory;
     State state = {0.0, 0.0, 0.0, 0.0, 0.0};
 
-    for(int t=0; t<=predict_time_; t+=dt_)
+    for(double t=0.0; t<=predict_time_; t+=dt_)
     {
         move_robot_image(state, vel, yawrate);
         trajectory.push_back(state);
     }
 
+    // ROS_WARN_STREAM("trajectory.back().x: " << trajectory.back().x);
+    // ROS_WARN_STREAM("trajectory.back().y: " << trajectory.back().y);
     return trajectory;
 }
 
 void DWAPlanner::move_robot_image(State& state, double vel, double yawrate)
 {
+    ROS_WARN_STREAM("vel: " << vel);
+    ROS_WARN_STREAM("yawrate: " << yawrate);
+    ROS_WARN_STREAM("dt_: " << dt_);
     state.x += vel * cos(state.yaw) * dt_;
     state.y += vel * sin(state.yaw) * dt_;
     state.yaw += yawrate * dt_;
@@ -282,8 +295,15 @@ void DWAPlanner::visualize_trajectory(const std::vector<State>& trajectory, cons
     {
         pose.pose.position.x = state.x;
         pose.pose.position.y = state.y;
+        std::cout << "x: " << state.x << std::endl;
+        std::cout << "y: " << state.y << std::endl;
         local_path.poses.push_back(pose);
     }
 
     local_path_pub.publish(local_path);
+}
+
+void DWAPlanner::debager()
+{
+    ROS_ERROR_STREAM("hogehoge");
 }

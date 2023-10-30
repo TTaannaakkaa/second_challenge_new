@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="local_path_planner_settings" default="$(find local_path_planner)/config/param/local_path_planner.yaml"/>
+    <node pkg="local_path_planner" type="local_path_planner_node" name="local_path_planner" output="screen">
+        <rosparam command="load" file="$(arg local_path_planner_settings)"/>
+    </node>
+</launch>

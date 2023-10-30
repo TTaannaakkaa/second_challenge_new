@@ -34,6 +34,7 @@ class DWAPlanner
     public:
         DWAPlanner();
         void process();
+        void debager();
 
     private:
         void local_goal_callback(const geometry_msgs::PointStamped::ConstPtr& msg);

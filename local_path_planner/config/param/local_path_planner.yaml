@@ -10,7 +10,7 @@ min_vel: 0.0
 max_yawrate: 1.0
 min_yawrate: -1.0
 max_accel: 1000.0
-mav_dyawrate: 1000.0
+max_dyawrate: 1000.0
 
 v_reso: 0.05
 y_reso: 0.1
