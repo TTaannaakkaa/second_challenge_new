@@ -1,25 +1,46 @@
+# hz: 10
+
+# dt: 0.1
+# predict_time: 4.0
+
+# goal_tolerance: 0.5
+
+# max_vel: 0.45
+# min_vel: 0.0
+# max_yawrate: 1.0
+# min_yawrate: -1.0
+# max_accel: 1000.0
+# max_dyawrate: 1000.0
+
+# v_reso: 0.05
+# y_reso: 0.1
+
+# heading_cost_gain: 1.0
+# velocity_cost_gain: 1.0
+# obstacle_cost_gain: 1.0
+
+# robit_radius: 0.25
+# radius_margin: 0.1
+
+# search_radius: 0.95
+
 hz: 10
-
-dt: 0.1
-predict_time: 4.0
-
-goal_tolerance: 0.5
-
-max_vel: 0.45
+goal_tolerance: 0.3
+max_vel: 0.25
 min_vel: 0.0
 max_yawrate: 1.0
-min_yawrate: -1.0
-max_accel: 1000.0
-max_dyawrate: 1000.0
-
-v_reso: 0.05
-y_reso: 0.1
-
-heading_cost_gain: 1.0
-velocity_cost_gain: 1.0
-obstacle_cost_gain: 1.0
-
-robit_radius: 0.25
+max_accel: 1.0
+max_dyawrate: 1.0
+dt: 0.1
+predict_time: 4.0
+# weight_heading: 0.9
+weight_heading: 1.0
+# weight_distance: 1.6
+weight_distance: 1.0
+# weight_velocity: 1.1
+weight_velocity: 1.0
+search_range: 1.0
+roomba_radius: 0.2
 radius_margin: 0.1
-
-search_radius: 0.95
+vel_reso: 0.05
+yawrate_reso: 0.1
